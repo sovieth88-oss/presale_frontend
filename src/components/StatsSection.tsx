@@ -7,8 +7,11 @@ interface StatsSectionProps {
     totalWithdrawn: string;
     totalParticipants: number;
     contractBalance: string;
+    softcap: string;
     hardcap: string;
     progressPercentage: number;
+    softcapProgressPercentage: number;
+    softcapReached: boolean;
   };
   userStats: {
     contribution: string;
@@ -199,39 +202,39 @@ const StatsSection: React.FC<StatsSectionProps> = ({ presaleStats, userStats }) 
     <section style={sectionStyle}>
       <div style={containerStyle}>
         <h2 style={titleStyle}>
-          Presale <span style={titleSpanStyle}>Statistics</span>
+          SoviETH War Chest <span style={titleSpanStyle}>(Live Data)</span>
         </h2>
         <p style={subtitleStyle}>
-          Real-time data about the Sovieth presale progress and your participation
+          Real-time intelligence on the people's revolution and your comrade status
         </p>
 
         {/* Global Presale Stats */}
         <div style={{ marginBottom: '60px' }}>
-          <h3 style={sectionTitleStyle}>Global Presale Data</h3>
+          <h3 style={sectionTitleStyle}>Revolutionary Treasury Status</h3>
           <div style={gridStyle}>
             <StatCard
-              title="Total Raised"
+              title="Raised"
               value={`${presaleStats.totalRaised} ETH`}
-              subtitle={`${presaleStats.progressPercentage}% of hardcap`}
+              subtitle={`${presaleStats.progressPercentage}% of target`}
               highlight
               emoji="🚀"
             />
             <StatCard
-              title="Hardcap"
-              value={`${presaleStats.hardcap} ETH`}
-              subtitle="Maximum funding goal"
+              title="Soft/Hard Cap"
+              value={`${presaleStats.softcap}/${presaleStats.hardcap} ETH`}
+              subtitle={presaleStats.softcapReached ? "✅ Softcap achieved!" : "Min/Max funding goals"}
               emoji="🎯"
             />
             <StatCard
               title="Participants"
-              value={presaleStats.totalParticipants.toString()}
-              subtitle="Unique contributors"
+              value={`${presaleStats.totalParticipants} comrades`}
+              subtitle="enlisted"
               emoji="👥"
             />
             <StatCard
-              title="Available Balance"
+              title="Contract Balance"
               value={`${presaleStats.contractBalance} ETH`}
-              subtitle="Contract balance"
+              subtitle="War chest balance"
               emoji="💰"
             />
           </div>
@@ -240,7 +243,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ presaleStats, userStats }) 
         {/* Progress Bar */}
         <div style={progressSectionStyle}>
           <div style={progressHeaderStyle}>
-            <span style={progressLabelStyle}>Presale Progress</span>
+            <span style={progressLabelStyle}>Progress</span>
             <span style={progressValueStyle}>{presaleStats.progressPercentage}%</span>
           </div>
           <div style={progressBarContainerStyle}>
@@ -255,6 +258,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ presaleStats, userStats }) 
           </div>
           <div style={progressLabelsStyle}>
             <span>0 ETH</span>
+            <span style={{ color: '#fbbf24' }}>{presaleStats.softcap} ETH (Softcap)</span>
             <span>{presaleStats.hardcap} ETH</span>
           </div>
         </div>
@@ -262,7 +266,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ presaleStats, userStats }) 
         {/* User Stats (if connected) */}
         {isConnected && address && (
           <div>
-            <h3 style={sectionTitleStyle}>Your Participation</h3>
+            <h3 style={sectionTitleStyle}>Your Comrade Status</h3>
             <div style={{ ...gridStyle, maxWidth: '900px', margin: '0 auto 40px auto' }}>
               <StatCard
                 title="Your Contribution"
@@ -278,9 +282,9 @@ const StatsSection: React.FC<StatsSectionProps> = ({ presaleStats, userStats }) 
                 emoji="💎"
               />
               <StatCard
-                title="Whitelist Status"
-                value={userStats.isWhitelisted ? "Approved" : "Not Listed"}
-                subtitle={userStats.isWhitelisted ? "Eligible to buy" : "Contact team"}
+                title="Comrade Status"
+                value={userStats.isWhitelisted ? "Cleared for ranks" : "Not Listed"}
+                subtitle={userStats.isWhitelisted ? "Ready to enlist" : "Contact command"}
                 emoji={userStats.isWhitelisted ? "✅" : "❌"}
               />
             </div>
@@ -354,10 +358,10 @@ const StatsSection: React.FC<StatsSectionProps> = ({ presaleStats, userStats }) 
               padding: 0,
               margin: 0
             }}>
-              <li style={{ marginBottom: '8px' }}>• Only whitelisted addresses can participate</li>
-              <li style={{ marginBottom: '8px' }}>• No time limit - presale runs until manually stopped</li>
-              <li style={{ marginBottom: '8px' }}>• Tokens will be distributed after launch</li>
-              <li>• Admin can withdraw funds before hardcap</li>
+              <li style={{ marginBottom: '8px' }}>• Only whitelisted comrades may enlist</li>
+              <li style={{ marginBottom: '8px' }}>• No fixed end — presale continues until hardcap</li>
+              <li style={{ marginBottom: '8px' }}>• Tokens distributed after Uniswap deployment</li>
+              <li>• Command can withdraw for treasury needs</li>
             </ul>
           </div>
           <div style={{
@@ -377,10 +381,11 @@ const StatsSection: React.FC<StatsSectionProps> = ({ presaleStats, userStats }) 
               padding: 0,
               margin: 0
             }}>
-              <li style={{ marginBottom: '8px' }}>• Secure smart contract with audited code</li>
-              <li style={{ marginBottom: '8px' }}>• Real-time progress tracking</li>
-              <li style={{ marginBottom: '8px' }}>• Transparent allocation system</li>
-              <li>• Emergency pause functionality</li>
+              <li style={{ marginBottom: '8px' }}>🔒 Immutable + audited contracts</li>
+              <li style={{ marginBottom: '8px' }}>📈 On-chain progress tracking</li>
+              <li style={{ marginBottom: '8px' }}>🪧 Transparent allocation — no tricks</li>
+              <li style={{ marginBottom: '8px' }}>⛔ Emergency pause (multisig control)</li>
+              <li>🛡️ Community-led treasury, not individuals</li>
             </ul>
           </div>
         </div>

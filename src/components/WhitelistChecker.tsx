@@ -202,16 +202,16 @@ const WhitelistChecker: React.FC<WhitelistCheckerProps> = ({
     <section style={sectionStyle}>
       <div style={containerStyle}>
         <h2 style={titleStyle}>
-          Whitelist <span style={titleSpanStyle}>Checker</span>
+          <span style={titleSpanStyle}>Comrade</span> Verification
         </h2>
         <p style={subtitleStyle}>
-          Check if your address is whitelisted for the Sovieth presale
+          Enter your Ethereum address to see if you've been cleared for the presale ranks.
         </p>
 
         <div style={checkerCardStyle}>
           {/* Address Input */}
           <div style={inputSectionStyle}>
-            <label style={labelStyle}>Ethereum Address</label>
+            <label style={labelStyle}>Comrade Address</label>
             <div style={inputContainerStyle}>
               <input
                 type="text"
@@ -256,15 +256,15 @@ const WhitelistChecker: React.FC<WhitelistCheckerProps> = ({
                 {result.isWhitelisted ? '✅' : '❌'}
               </div>
               <h3 style={resultTitleStyle}>
-                {result.isWhitelisted ? 'Whitelisted!' : 'Not Whitelisted'}
+                {result.isWhitelisted ? 'Cleared for Ranks!' : 'Not Listed'}
               </h3>
               <p style={addressStyle}>
                 Address: {result.address.slice(0, 6)}...{result.address.slice(-4)}
               </p>
               <p style={resultMessageStyle}>
                 {result.isWhitelisted
-                  ? 'You are eligible to participate in the presale!'
-                  : 'This address is not currently whitelisted for the presale.'}
+                  ? 'You are approved to join the presale, comrade!'
+                  : 'Contact the command team for whitelist approval.'}
               </p>
             </div>
           )}
@@ -302,7 +302,7 @@ const WhitelistChecker: React.FC<WhitelistCheckerProps> = ({
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  Buy Tokens Now
+                  Buy Now, Comrade
                 </button>
               )}
             </div>

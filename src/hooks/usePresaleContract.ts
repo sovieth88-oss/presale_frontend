@@ -14,10 +14,13 @@ export interface PresaleStats {
   totalWithdrawn: string;
   totalParticipants: number;
   contractBalance: string;
+  softcap: string;
   hardcap: string;
   tokenPrice: string;
   maxPurchase: string;
   progressPercentage: number;
+  softcapProgressPercentage: number;
+  softcapReached: boolean;
   isPaused: boolean;
 }
 
@@ -40,10 +43,13 @@ export const usePresaleContract = () => {
     totalWithdrawn: '0',
     totalParticipants: 0,
     contractBalance: '0',
-    hardcap: '100',
-    tokenPrice: '0.001',
-    maxPurchase: '5',
+    softcap: '5',
+    hardcap: '10',
+    tokenPrice: '0.00000025',
+    maxPurchase: '0.25',
     progressPercentage: 0,
+    softcapProgressPercentage: 0,
+    softcapReached: false,
     isPaused: false
   });
   const [userStats, setUserStats] = useState<UserStats>({
@@ -108,8 +114,8 @@ export const usePresaleContract = () => {
     if (presaleData && hardcapData && tokenPriceData && maxPurchaseData) {
       // Type check and ensure data is properly formatted
       const statsArray = Array.isArray(presaleData) ? presaleData : [];
-      if (statsArray.length >= 5) {
-        const [totalRaised, totalWithdrawn, totalParticipants, contractBalance, isPaused] = statsArray;
+      if (statsArray.length >= 8) {
+        const [softcap, hardcap, totalRaised, totalWithdrawn, totalParticipants, contractBalance, isPaused, softcapReached] = statsArray;
 
         // Helper function to safely convert to bigint
         const safeBigInt = (value: any): bigint => {
@@ -119,17 +125,21 @@ export const usePresaleContract = () => {
         };
 
         const raisedEth = formatEthValue(safeBigInt(totalRaised));
-        const hardcapEth = formatEthValue(safeBigInt(hardcapData));
+        const softcapEth = formatEthValue(safeBigInt(softcap));
+        const hardcapEth = formatEthValue(safeBigInt(hardcap));
 
         setPresaleStats({
           totalRaised: raisedEth,
           totalWithdrawn: formatEthValue(safeBigInt(totalWithdrawn)),
           totalParticipants: Number(totalParticipants || 0),
           contractBalance: formatEthValue(safeBigInt(contractBalance)),
+          softcap: softcapEth,
           hardcap: hardcapEth,
           tokenPrice: formatEthValue(safeBigInt(tokenPriceData)),
           maxPurchase: formatEthValue(safeBigInt(maxPurchaseData)),
           progressPercentage: calculateProgress(raisedEth, hardcapEth),
+          softcapProgressPercentage: calculateProgress(raisedEth, softcapEth),
+          softcapReached: Boolean(softcapReached),
           isPaused: Boolean(isPaused)
         });
       }

@@ -6,7 +6,7 @@ interface HeaderProps {
   onBuyNowClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ }) => {
+const Header: React.FC<HeaderProps> = ({}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isWalletReady, setIsWalletReady] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -25,7 +25,9 @@ const Header: React.FC<HeaderProps> = ({ }) => {
       // Test if provider is responsive
       if (provider && typeof (provider as any).request === "function") {
         // Try a simple eth_accounts call
-        const accounts = await (provider as any).request({ method: "eth_accounts" });
+        const accounts = await (provider as any).request({
+          method: "eth_accounts",
+        });
 
         if (
           accounts &&
@@ -275,7 +277,12 @@ const Header: React.FC<HeaderProps> = ({ }) => {
         <div style={containerStyle}>
           <div style={headerInnerStyle}>
             <a href="/" style={logoStyle}>
-              SOVIETH
+              {/* SOVIETH */}
+              <img
+                loading="lazy"
+                src="/site_logo_2.svg"
+                alt="Memecoin Site Logo"
+              />
             </a>
 
             <div style={headerRightStyle}>

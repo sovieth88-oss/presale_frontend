@@ -53,8 +53,10 @@ const HomePage: React.FC = () => {
           onBuyNowClick={handleBuyNowClick}
           presaleStats={{
             totalRaised: presaleStats.totalRaised,
+            softcap: presaleStats.softcap,
             hardcap: presaleStats.hardcap,
             progressPercentage: presaleStats.progressPercentage,
+            softcapProgressPercentage: presaleStats.softcapProgressPercentage,
             tokenPrice: presaleStats.tokenPrice
           }}
         />
