@@ -316,6 +316,7 @@ export const usePresaleContract = () => {
   };
 
   const updatePresaleConfig = async (
+    softcap: string,
     hardcap: string,
     tokenPrice: string,
     maxPurchase: string
@@ -331,6 +332,7 @@ export const usePresaleContract = () => {
         abi: PRESALE_CONTRACT_ABI,
         functionName: 'updatePresaleConfig',
         args: [
+          parseEther(softcap),
           parseEther(hardcap),
           parseEther(tokenPrice),
           parseEther(maxPurchase)

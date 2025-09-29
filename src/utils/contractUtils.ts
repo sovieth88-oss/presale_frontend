@@ -1,5 +1,6 @@
 export const PRESALE_CONTRACT_ABI = [
   // Read functions
+  "function softcap() view returns (uint256)",
   "function hardcap() view returns (uint256)",
   "function tokenPrice() view returns (uint256)",
   "function maxPurchase() view returns (uint256)",
@@ -14,15 +15,16 @@ export const PRESALE_CONTRACT_ABI = [
 
   // View functions
   "function isWhitelisted(address user) view returns (bool)",
-  "function getPresaleStats() view returns (uint256 _totalRaised, uint256 _totalWithdrawn, uint256 _totalParticipants, uint256 _contractBalance, bool _isPaused)",
+  "function isSoftcapReached() view returns (bool)",
+  "function getPresaleStats() view returns (uint256 _softcap, uint256 _hardcap, uint256 _totalRaised, uint256 _totalWithdrawn, uint256 _totalParticipants, uint256 _contractBalance, bool _isPaused, bool _softcapReached)",
   "function getUserInfo(address user) view returns (uint256 contribution, uint256 tokenAllocation, bool isWhitelistedUser)",
 
   // Write functions
   "function buyTokens() payable",
   "function addToWhitelist(address[] addresses)",
   "function removeFromWhitelist(address[] addresses)",
-  "function withdrawETH(uint256 amount, address to)",
-  "function updatePresaleConfig(uint256 _hardcap, uint256 _tokenPrice, uint256 _maxPurchase)",
+  "function withdrawETH(uint256 amount, address payable to)",
+  "function updatePresaleConfig(uint256 _softcap, uint256 _hardcap, uint256 _tokenPrice, uint256 _maxPurchase)",
   "function pausePresale()",
   "function unpausePresale()",
   "function emergencyWithdraw()",
@@ -32,7 +34,8 @@ export const PRESALE_CONTRACT_ABI = [
   "event WhitelistAdded(address[] addresses)",
   "event WhitelistRemoved(address[] addresses)",
   "event ETHWithdrawn(uint256 amount, address indexed to)",
-  "event PresaleConfigUpdated(uint256 hardcap, uint256 tokenPrice, uint256 maxPurchase)",
+  "event SoftcapReached(uint256 totalRaised)",
+  "event PresaleConfigUpdated(uint256 softcap, uint256 hardcap, uint256 tokenPrice, uint256 maxPurchase)",
 ] as const;
 
 // Contract addresses - Update these after deployment
@@ -40,8 +43,8 @@ export const CONTRACT_ADDRESSES = {
   // Update these addresses after deploying to respective networks
   mainnet: "",
   bnb: "0x4A352D535A417cbec0Ab529F7A438669702FBB8C", // Testnet
-  localhost: "", // Local development
-  hardhat: "", // Hardhat local network
+  localhost: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // Local development
+  hardhat: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // Hardhat local network
 } as const;
 
 // Network configuration

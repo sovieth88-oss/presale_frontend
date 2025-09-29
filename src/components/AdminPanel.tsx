@@ -21,6 +21,7 @@ const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'withdraw' | 'whitelist' | 'control' | 'config'>('withdraw');
 
   // Configuration form state
+  const [configSoftcap, setConfigSoftcap] = useState('');
   const [configHardcap, setConfigHardcap] = useState('');
   const [configTokenPrice, setConfigTokenPrice] = useState('');
   const [configMaxPurchase, setConfigMaxPurchase] = useState('');
@@ -133,26 +134,33 @@ const AdminPanel: React.FC = () => {
   };
 
   const handleUpdateConfig = async () => {
-    if (!configHardcap || !configTokenPrice || !configMaxPurchase) {
+    if (!configSoftcap || !configHardcap || !configTokenPrice || !configMaxPurchase) {
       alert('Please fill in all configuration fields');
       return;
     }
 
+    const softcap = parseFloat(configSoftcap);
     const hardcap = parseFloat(configHardcap);
     const tokenPrice = parseFloat(configTokenPrice);
     const maxPurchase = parseFloat(configMaxPurchase);
 
-    if (hardcap <= 0 || tokenPrice <= 0 || maxPurchase <= 0) {
+    if (softcap <= 0 || hardcap <= 0 || tokenPrice <= 0 || maxPurchase <= 0) {
       alert('All values must be greater than 0');
+      return;
+    }
+
+    if (hardcap <= softcap) {
+      alert('Hardcap must be greater than softcap');
       return;
     }
 
     try {
       setIsProcessing(true);
       clearError();
-      await updatePresaleConfig(configHardcap, configTokenPrice, configMaxPurchase);
+      await updatePresaleConfig(configSoftcap, configHardcap, configTokenPrice, configMaxPurchase);
       alert('Presale configuration updated successfully!');
       // Clear form
+      setConfigSoftcap('');
       setConfigHardcap('');
       setConfigTokenPrice('');
       setConfigMaxPurchase('');
@@ -166,6 +174,7 @@ const AdminPanel: React.FC = () => {
   // Load current config values when component mounts
   React.useEffect(() => {
     if (presaleStats) {
+      setConfigSoftcap(presaleStats.softcap);
       setConfigHardcap(presaleStats.hardcap);
       setConfigTokenPrice(presaleStats.tokenPrice);
       setConfigMaxPurchase(presaleStats.maxPurchase);
