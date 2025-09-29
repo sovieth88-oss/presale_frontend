@@ -39,7 +39,7 @@ export const PRESALE_CONTRACT_ABI = [
 export const CONTRACT_ADDRESSES = {
   // Update these addresses after deploying to respective networks
   mainnet: "",
-  bnb: "0x9a5983Ee97D4D8e9237FC5363B9813c9A477c7b0", // Testnet
+  bnb: "0x4A352D535A417cbec0Ab529F7A438669702FBB8C", // Testnet
   localhost: "", // Local development
   hardhat: "", // Hardhat local network
 } as const;
