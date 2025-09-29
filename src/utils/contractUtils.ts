@@ -42,7 +42,7 @@ export const PRESALE_CONTRACT_ABI = [
 export const CONTRACT_ADDRESSES = {
   // Update these addresses after deploying to respective networks
   mainnet: "",
-  bnb: "0x4A352D535A417cbec0Ab529F7A438669702FBB8C", // Testnet
+  testnet: "0x4A352D535A417cbec0Ab529F7A438669702FBB8C", // Testnet
   localhost: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // Local development
   hardhat: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // Hardhat local network
 } as const;
@@ -50,7 +50,7 @@ export const CONTRACT_ADDRESSES = {
 // Network configuration
 export const SUPPORTED_CHAINS = {
   mainnet: 1,
-  bnb: 97,
+  testnet: 97,
   localhost: 31337,
   hardhat: 31337,
 } as const;
@@ -60,8 +60,8 @@ export const getContractAddress = (chainId: number): string => {
   switch (chainId) {
     case SUPPORTED_CHAINS.mainnet:
       return CONTRACT_ADDRESSES.mainnet;
-    case SUPPORTED_CHAINS.bnb:
-      return CONTRACT_ADDRESSES.bnb;
+    case SUPPORTED_CHAINS.testnet:
+      return CONTRACT_ADDRESSES.testnet;
     case SUPPORTED_CHAINS.localhost:
     case SUPPORTED_CHAINS.hardhat:
       return CONTRACT_ADDRESSES.localhost || CONTRACT_ADDRESSES.hardhat;

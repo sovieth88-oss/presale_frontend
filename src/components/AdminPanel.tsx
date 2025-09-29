@@ -12,7 +12,10 @@ const AdminPanel: React.FC = () => {
     unpausePresale,
     updatePresaleConfig,
     error,
-    clearError
+    clearError,
+    isPurchasing,
+    isConfirmed,
+    transactionHash
   } = usePresaleContract();
 
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -25,10 +28,47 @@ const AdminPanel: React.FC = () => {
   const [configHardcap, setConfigHardcap] = useState('');
   const [configTokenPrice, setConfigTokenPrice] = useState('');
   const [configMaxPurchase, setConfigMaxPurchase] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [lastAction, setLastAction] = useState<string>('');
 
   // Check if current user is admin (this should be determined by contract owner check)
   const isAdmin = true; // For demo - in production, check if address is contract owner
+
+  // Handle transaction confirmation
+  React.useEffect(() => {
+    if (isConfirmed && lastAction && transactionHash) {
+      // Show success message based on last action
+      switch (lastAction) {
+        case 'addToWhitelist':
+          alert(`Addresses added to whitelist successfully! Transaction: ${transactionHash}`);
+          setWhitelistAddresses('');
+          break;
+        case 'removeFromWhitelist':
+          alert(`Addresses removed from whitelist successfully! Transaction: ${transactionHash}`);
+          setWhitelistAddresses('');
+          break;
+        case 'withdraw':
+          alert(`ETH withdrawal completed successfully! Transaction: ${transactionHash}`);
+          setWithdrawAmount('');
+          setWithdrawRecipient('');
+          break;
+        case 'pause':
+          alert(`Presale paused successfully! Transaction: ${transactionHash}`);
+          break;
+        case 'unpause':
+          alert(`Presale unpaused successfully! Transaction: ${transactionHash}`);
+          break;
+        case 'updateConfig':
+          alert(`Presale configuration updated successfully! Transaction: ${transactionHash}`);
+          setConfigSoftcap('');
+          setConfigHardcap('');
+          setConfigTokenPrice('');
+          setConfigMaxPurchase('');
+          break;
+      }
+
+      setLastAction('');
+    }
+  }, [isConfirmed, lastAction, transactionHash]);
 
   const handleWithdraw = async () => {
     if (!withdrawAmount || !withdrawRecipient) {
@@ -42,16 +82,12 @@ const AdminPanel: React.FC = () => {
     }
 
     try {
-      setIsProcessing(true);
+      setLastAction('withdraw');
       clearError();
       await withdrawETH(withdrawAmount, withdrawRecipient);
-      setWithdrawAmount('');
-      setWithdrawRecipient('');
-      alert('Withdrawal initiated successfully!');
     } catch (error) {
       console.error('Withdrawal failed:', error);
-    } finally {
-      setIsProcessing(false);
+      setLastAction('');
     }
   };
 
@@ -73,15 +109,12 @@ const AdminPanel: React.FC = () => {
     }
 
     try {
-      setIsProcessing(true);
+      setLastAction('addToWhitelist');
       clearError();
       await addToWhitelist(addresses);
-      setWhitelistAddresses('');
-      alert(`${addresses.length} addresses added to whitelist successfully!`);
     } catch (error) {
       console.error('Adding to whitelist failed:', error);
-    } finally {
-      setIsProcessing(false);
+      setLastAction('');
     }
   };
 
@@ -103,33 +136,28 @@ const AdminPanel: React.FC = () => {
     }
 
     try {
-      setIsProcessing(true);
+      setLastAction('removeFromWhitelist');
       clearError();
       await removeFromWhitelist(addresses);
-      setWhitelistAddresses('');
-      alert(`${addresses.length} addresses removed from whitelist successfully!`);
     } catch (error) {
       console.error('Removing from whitelist failed:', error);
-    } finally {
-      setIsProcessing(false);
+      setLastAction('');
     }
   };
 
   const handlePauseToggle = async () => {
     try {
-      setIsProcessing(true);
       clearError();
       if (presaleStats.isPaused) {
+        setLastAction('unpause');
         await unpausePresale();
-        alert('Presale unpaused successfully!');
       } else {
+        setLastAction('pause');
         await pausePresale();
-        alert('Presale paused successfully!');
       }
     } catch (error) {
       console.error('Pause/unpause failed:', error);
-    } finally {
-      setIsProcessing(false);
+      setLastAction('');
     }
   };
 
@@ -155,19 +183,12 @@ const AdminPanel: React.FC = () => {
     }
 
     try {
-      setIsProcessing(true);
+      setLastAction('updateConfig');
       clearError();
       await updatePresaleConfig(configSoftcap, configHardcap, configTokenPrice, configMaxPurchase);
-      alert('Presale configuration updated successfully!');
-      // Clear form
-      setConfigSoftcap('');
-      setConfigHardcap('');
-      setConfigTokenPrice('');
-      setConfigMaxPurchase('');
     } catch (error) {
       console.error('Configuration update failed:', error);
-    } finally {
-      setIsProcessing(false);
+      setLastAction('');
     }
   };
 
@@ -324,10 +345,10 @@ const AdminPanel: React.FC = () => {
 
                   <button
                     onClick={handleWithdraw}
-                    disabled={isProcessing || !withdrawAmount || !withdrawRecipient}
+                    disabled={isPurchasing || !withdrawAmount || !withdrawRecipient}
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 rounded-lg font-bold transition-all duration-200 disabled:cursor-not-allowed"
                   >
-                    {isProcessing ? 'Processing...' : 'Withdraw ETH'}
+                    {isPurchasing && lastAction === 'withdraw' ? 'Processing Transaction...' : 'Withdraw ETH'}
                   </button>
                 </div>
               )}
@@ -353,17 +374,17 @@ const AdminPanel: React.FC = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <button
                       onClick={handleAddToWhitelist}
-                      disabled={isProcessing || !whitelistAddresses.trim()}
+                      disabled={isPurchasing || !whitelistAddresses.trim()}
                       className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 disabled:cursor-not-allowed"
                     >
-                      {isProcessing ? 'Processing...' : 'Add to Whitelist'}
+                      {isPurchasing && lastAction === 'addToWhitelist' ? 'Processing...' : 'Add to Whitelist'}
                     </button>
                     <button
                       onClick={handleRemoveFromWhitelist}
-                      disabled={isProcessing || !whitelistAddresses.trim()}
+                      disabled={isPurchasing || !whitelistAddresses.trim()}
                       className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 disabled:cursor-not-allowed"
                     >
-                      {isProcessing ? 'Processing...' : 'Remove from Whitelist'}
+                      {isPurchasing && lastAction === 'removeFromWhitelist' ? 'Processing...' : 'Remove from Whitelist'}
                     </button>
                   </div>
                 </div>
@@ -381,14 +402,14 @@ const AdminPanel: React.FC = () => {
                     </p>
                     <button
                       onClick={handlePauseToggle}
-                      disabled={isProcessing}
+                      disabled={isPurchasing}
                       className={`px-8 py-4 rounded-lg font-bold transition-all duration-200 disabled:cursor-not-allowed ${
                         presaleStats.isPaused
                           ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
                           : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
                       }`}
                     >
-                      {isProcessing ? 'Processing...' : (presaleStats.isPaused ? 'Unpause Presale' : 'Pause Presale')}
+                      {isPurchasing && (lastAction === 'pause' || lastAction === 'unpause') ? 'Processing...' : (presaleStats.isPaused ? 'Unpause Presale' : 'Pause Presale')}
                     </button>
                   </div>
 
@@ -416,16 +437,16 @@ const AdminPanel: React.FC = () => {
                     <h3 className="text-white font-semibold mb-4">Current Configuration</h3>
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
+                        <span className="text-gray-400">Softcap:</span>
+                        <span className="text-white ml-2">{presaleStats.softcap} ETH</span>
+                      </div>
+                      <div>
                         <span className="text-gray-400">Hardcap:</span>
                         <span className="text-white ml-2">{presaleStats.hardcap} ETH</span>
                       </div>
                       <div>
                         <span className="text-gray-400">Token Price:</span>
                         <span className="text-white ml-2">{presaleStats.tokenPrice} ETH</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-400">Min Purchase:</span>
-                        <span className="text-white ml-2">No minimum</span>
                       </div>
                       <div>
                         <span className="text-gray-400">Max Purchase:</span>
@@ -437,6 +458,21 @@ const AdminPanel: React.FC = () => {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-gray-400 text-sm font-medium mb-2">
+                        Softcap (ETH)
+                      </label>
+                      <input
+                        type="number"
+                        value={configSoftcap}
+                        onChange={(e) => setConfigSoftcap(e.target.value)}
+                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500"
+                        placeholder="5"
+                        step="0.1"
+                        min="0"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-400 text-sm font-medium mb-2">
                         Hardcap (ETH)
                       </label>
                       <input
@@ -444,7 +480,7 @@ const AdminPanel: React.FC = () => {
                         value={configHardcap}
                         onChange={(e) => setConfigHardcap(e.target.value)}
                         className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500"
-                        placeholder="100"
+                        placeholder="10"
                         step="0.1"
                         min="0"
                       />
@@ -494,10 +530,10 @@ const AdminPanel: React.FC = () => {
 
                   <button
                     onClick={handleUpdateConfig}
-                    disabled={isProcessing || !configHardcap || !configTokenPrice || !configMaxPurchase}
+                    disabled={isPurchasing || !configSoftcap || !configHardcap || !configTokenPrice || !configMaxPurchase}
                     className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-600 disabled:to-gray-700 text-white py-4 rounded-lg font-bold transition-all duration-200 disabled:cursor-not-allowed"
                   >
-                    {isProcessing ? 'Updating Configuration...' : 'Update Presale Configuration'}
+                    {isPurchasing && lastAction === 'updateConfig' ? 'Updating Configuration...' : 'Update Presale Configuration'}
                   </button>
                 </div>
               )}
